@@ -1,5 +1,7 @@
 package org.example.project.view
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -7,15 +9,18 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
 import com.aay.compose.donutChart.PieChart
 import com.aay.compose.donutChart.model.PieChartData
+import ir.ehsannarmani.compose_charts.RowChart
+import ir.ehsannarmani.compose_charts.models.BarProperties
+import ir.ehsannarmani.compose_charts.models.Bars
 import kotlinx.coroutines.*
-import org.example.project.service.GetChartsInfo
+import org.example.project.service.ChartsInfoService
 
-enum class ChartsPage {
-                      PIE_CHART, DEFAULT
-}
+enum class ChartsPage { PIE_CHART, DEFAULT}
 
 @Composable
 fun ChartsScopePage() {
@@ -32,7 +37,7 @@ fun ChartsScopePage() {
             //delay(10000)
             currentPage = ChartsPage.DEFAULT
             val info = withContext(Dispatchers.Default) {
-                GetChartsInfo().getInfo()
+                ChartsInfoService().getInfo()
             }
 
             print(info)

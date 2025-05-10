@@ -23,14 +23,21 @@ import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Clock
+import org.example.project.service.GraphResponse
+import org.example.project.service.GrapsMetricsService
+import org.example.project.service.UsersInfoService
 import kotlin.math.*
 
 data class Node(
@@ -190,50 +197,101 @@ data class Node(
 //    }
 //}
 
+@Composable
+fun TableRow(label: String, value: Any) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(label, fontWeight = FontWeight.Medium)
+        Text(value.toString(), fontWeight = FontWeight.Normal)
+    }
+}
+
 @OptIn(ExperimentalUuidApi::class)
 @Composable
 fun UsersPage(scope: CoroutineScope) {
 
     var name by remember { mutableStateOf("") }
     val users = remember { mutableStateListOf<User>() }
+    var graphInfo by remember { mutableStateOf(GraphResponse(
+        0,
+        0.0,
+        0.0,
+        0.0,
+        0,
+        0
+    ))}
 
     LaunchedEffect(Unit) {
         while (true) {
             users.clear()
-            val randInt = (1..2).shuffled().first()
-            for (i in 0..randInt step 1) {
-                // тут запрос в бд на топ клиентов с сортировкой по мета информации
-                users.add(User(Uuid.random().toString(), "User"))
+            val peerIds = UsersInfoService().getInfo()
+            for (id in peerIds) {
+                users.add(User(id, "User"))
             }
             delay(5000)
         }
     }
 
+    LaunchedEffect(Unit) {
+        while (true) {
+            graphInfo = GrapsMetricsService().getInfo()
+            delay(5000)
+        }
+    }
+
     Column {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text("Характеристики графа", fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 12.dp))
+
+            TableRow("Компоненты связности сети:", graphInfo.connectedComponentsParam)
+            TableRow("Алгебраическая связность:", graphInfo.algebraicConnectivity)
+            TableRow("Коэффициент кластеризации:", graphInfo.clusteringCoefficient)
+            TableRow("Ассоциативность по степени:", graphInfo.assortativityCoefficient)
+            TableRow("Средняя скорость загрузки:", graphInfo.downloadSpeed)
+            TableRow("Средняя скорость передачи:", graphInfo.uploadSpeed)
+        }
+
         LazyColumn (
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
         ) {
             items(users) { user ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(buildString {
-                        append(user.id)
-                        append(": ")
-                        append(user.name)
-                    }, modifier = Modifier.weight(1f))
-                    Button(onClick = {
-                        scope.launch {
-                            users.clear()
-                        }
-                    }) {
-                        Text("Delete")
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Person,
+                            contentDescription = "User Icon",
+                            modifier = Modifier.size(24.dp),
+                            tint = Color.Gray
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(
+                            text = "User ID: ${user.id}",
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
                     }
                 }
-                Spacer(Modifier.height(8.dp))
             }
         }
         Spacer(Modifier.height(16.dp))
-//        InteractiveGraph()
     }
 }

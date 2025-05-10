@@ -6,39 +6,27 @@ import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import kotlinx.serialization.json.Json
 import io.ktor.serialization.kotlinx.json.*
-import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import org.example.project.trackerServerUrl
 
-
-@Serializable
-data class Counters(
-    val capabilities : Int,
-    val ask : Int,
-    val check : Int,
-    val layer : Int,
-    val tms : Int
-)
-
-class GetChartsInfo {
+class UsersInfoService {
     private val client = HttpClient(CIO) {
         install(ContentNegotiation) {
             json( Json { ignoreUnknownKeys = true })
         }
     }
-    suspend fun getInfo() : Counters {
+    suspend fun getInfo() : List<String> {
         try {
-            val resp = client.get("http://localhost:8000/charts/counters") {
+            val resp = client.get("${trackerServerUrl}/charts/active") {
                 contentType(ContentType.Application.Json)
             }
 
-            val result = resp.body<Counters>()
+            val result = resp.body<List<String>>()
             return result
         } catch (er : Exception) {
             println(er.message)
         }
-        return Counters(0,0,0,0,0)
+        return listOf()
     }
-
-
 }

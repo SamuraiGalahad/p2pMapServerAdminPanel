@@ -11,6 +11,7 @@ logger = "2.0.4"
 datetime = "0.6.2"
 serialisation = "1.8.0"
 ehsannarmani-charts-version = "0.1.7"
+icons = "1.7.8"
 
 
 [libraries]

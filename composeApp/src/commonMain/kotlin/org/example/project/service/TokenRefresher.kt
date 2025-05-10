@@ -7,6 +7,7 @@ import io.ktor.http.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import org.example.project.dao.TokenHolder
+import org.example.project.trackerServerUrl
 import kotlin.time.Duration.Companion.minutes
 
 object TokenRefresher {
@@ -27,7 +28,7 @@ object TokenRefresher {
 
     suspend fun login(username : String, password : String) {
         try {
-            val response = client.post("http://localhost:8080/login") {
+            val response = client.post("${trackerServerUrl}/login") {
                 contentType(ContentType.Application.Json)
                 setBody(mapOf("username" to username,
                     "password" to password))

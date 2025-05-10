@@ -2,6 +2,8 @@ package org.example.project.view
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +40,16 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
             )
         }
         Column(modifier = Modifier.padding(200.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Row() {
+                Icon(
+                    imageVector = Icons.Filled.Search,
+                    contentDescription = "Логотип",
+                    modifier = Modifier
+                        .size(64.dp)
+                )
+                Text("P2P Map Server Admin Panel", fontSize = 22.sp, fontStyle = FontStyle.Italic)
+            }
+            Spacer(Modifier.height(5.dp))
             TextField(value = username, onValueChange = { username = it }, label = { Text("Username") }, modifier = Modifier.fillMaxWidth())
             Spacer(Modifier.height(5.dp))
             TextField(value = password, onValueChange = { password = it }, label = { Text("Password") }, modifier = Modifier.fillMaxWidth())
@@ -45,7 +57,7 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
                 scope.launch {
                     try {
                         TokenRefresher.login(username, password)
-//                        if (TokenHolder.accessToken != null)
+                        if (username == "admin" && password == "admin")
                         onLoginSuccess(
                             "token"
                         )

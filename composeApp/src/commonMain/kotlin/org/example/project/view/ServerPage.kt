@@ -20,6 +20,7 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
+import org.example.project.*
 
 private val client = HttpClient(CIO) {
     install(ContentNegotiation) {
@@ -40,21 +41,21 @@ fun ServerPage(scope: CoroutineScope) {
         {
             Button(onClick = {
                 scope.launch {
-                    client.post("http://localhost:8000/server/stop")
+                    client.post("${trackerServerUrl}/server/stop")
                 }
             }) {
                 Text("Shutdown Server")
             }
             Button(onClick = {
                 scope.launch {
-                    client.post("http://localhost:8000/server/reload")
+                    client.post("${trackerServerUrl}/server/reload")
                 }
             }) {
                 Text("Reload Server")
             }
             Button(onClick = {
                 scope.launch {
-
+                    client.post("${trackerServerUrl}/peers/changealg")
                 }
             }) {
                 Text("Change Algorithm")
@@ -76,6 +77,8 @@ fun ServerPage(scope: CoroutineScope) {
                 Text("Metrics scrapper")
                 Spacer(Modifier.height(10.dp))
                 Text("Database administration")
+                Spacer(Modifier.height(10.dp))
+                Text("Speed Network Test")
             }
 
             Column(
@@ -84,19 +87,24 @@ fun ServerPage(scope: CoroutineScope) {
                 modifier = Modifier.weight(1f)
             ) {
                 OutlinedButton(onClick = {
-                    localUriHandler.openUri("http://localhost:3000/")
+                    localUriHandler.openUri(grafanaUrl)
                 }) {
                     Text("Grafana")
                 }
                 OutlinedButton(onClick = {
-                    localUriHandler.openUri("http://localhost:9090/")
+                    localUriHandler.openUri(prometeusUrl)
                 }) {
                     Text("Prometheus")
                 }
                 OutlinedButton(onClick = {
-                    localUriHandler.openUri("http://localhost:80/")
+                    localUriHandler.openUri(pgAdminUrl)
                 }) {
                     Text("PgAdmin")
+                }
+                OutlinedButton(onClick = {
+                    localUriHandler.openUri(speedTestUrl)
+                }) {
+                    Text("SpeedTest")
                 }
             }
         }
@@ -122,9 +130,9 @@ fun ServerPage(scope: CoroutineScope) {
                 modifier = Modifier.weight(1f)
             ) {
                 Spacer(Modifier.height(10.dp))
-                ServiceStatusIndicator("http://localhost:8000/status/ping")
+                ServiceStatusIndicator("${trackerServerUrl}/status/ping")
                 Spacer(Modifier.height(10.dp))
-                ServiceStatusIndicator("http://localhost:9998/status")
+                ServiceStatusIndicator("${holePunchUrl}/status")
             }
         }
     }
